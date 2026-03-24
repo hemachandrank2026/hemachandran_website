@@ -23,7 +23,11 @@ export default function Home() {
     <>
       {/* Hero Section */}
       <section className={styles.hero}>
-        <div className={styles.heroContent}>
+        <div className={styles.heroContainer}>
+          <div className={styles.heroImageWrapper}>
+            <img src="https://res.cloudinary.com/dbeuhgjct/image/upload/v1774345756/portfolio/ohrc69ohfkspk9s472da.webp" alt="Dr. Hemachandran K" />
+          </div>
+          <div className={styles.heroContent}>
           <p className={styles.heroTag}>Director of AI Research Centre</p>
           <h1 className={styles.heroTitle}>
             Dr. Hemachandran <span className={styles.accent}>K</span>
@@ -46,6 +50,7 @@ export default function Home() {
                 {s.label}
               </a>
             ))}
+          </div>
           </div>
         </div>
       </section>

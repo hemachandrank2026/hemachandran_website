@@ -8,9 +8,14 @@ export async function GET() {
   return NextResponse.json(books);
 }
 
+import { optimizeImageUrl } from '@/lib/optimizeImageUrl';
+
 export async function POST(request: Request) {
   await dbConnect();
   const data = await request.json();
+  if (data.coverImage) {
+    data.coverImage = await optimizeImageUrl(data.coverImage);
+  }
   const book = await Book.create(data);
   return NextResponse.json(book, { status: 201 });
 }

@@ -1,0 +1,15 @@
+[dotenv@17.3.1] injecting env (6) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+Connected to MongoDB.
+Migrated 25 Books.
+Migrated 65 Publications.
+Migrated 9 Affiliations.
+Uploading hardcoded UI images...
+Uploading hemachandran.jpeg...
+Uploading hemachandran1.jpeg...
+
+--- UI Image URLs ---
+Home Page Image (hemachandran.jpeg): https://res.cloudinary.com/dbeuhgjct/image/upload/v1774345756/portfolio/ohrc69ohfkspk9s472da.webp
+About Page Image (hemachandran1.jpeg): https://res.cloudinary.com/dbeuhgjct/image/upload/v1774345757/portfolio/rmyalnv7z8pu407jrn3k.webp
+---------------------
+
+Migration Complete.

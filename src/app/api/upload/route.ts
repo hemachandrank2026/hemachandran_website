@@ -15,7 +15,11 @@ export async function POST(request: Request) {
 
     return new Promise<NextResponse>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: 'portfolio' },
+        { 
+          folder: 'portfolio',
+          format: 'webp',
+          transformation: [{ quality: 'auto', fetch_format: 'webp' }]
+        },
         (error, result) => {
           if (error) {
             console.error('Cloudinary Upload Error:', error);

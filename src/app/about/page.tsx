@@ -29,19 +29,21 @@ const patents = [
   'AI-Driven Multi-Modal Cognitive-Affective Consumer Decision Influence System for Ethical & Adaptive Retail Experiences',
 ];
 
-const affiliations = [
-  { name: 'T-Hub', img: '/images/hub.png' },
-  { name: 'AI 2030', img: '/images/2030.png' },
-  { name: 'DeepLearning.AI', img: '/images/deep.png' },
-  { name: 'Woxsen University', img: '/images/wox.png' },
-  { name: 'AASHE', img: '/images/aashe.png' },
-  { name: 'Atal Innovation Mission', img: '/images/aim.png' },
-  { name: 'Agzistence', img: '/images/agz.png' },
-  { name: 'AI Accelerator Institute', img: '/images/aiai.png' },
-  { name: 'University of Pécs', img: '/images/university.png' },
-];
+import dbConnect from '@/lib/mongodb';
+import Affiliation from '@/models/Affiliation';
 
-export default function AboutPage() {
+async function getAffiliations() {
+  try {
+    await dbConnect();
+    const affiliations = await Affiliation.find({}).sort({ order: 1, createdAt: -1 }).lean();
+    return JSON.parse(JSON.stringify(affiliations));
+  } catch {
+    return [];
+  }
+}
+
+export default async function AboutPage() {
+  const affiliations = await getAffiliations();
   return (
     <>
       <div className="page-banner">
@@ -52,8 +54,11 @@ export default function AboutPage() {
       <section className="section">
         <div className="container">
           <div className={styles.aboutGrid}>
+            <div className={styles.imageCard}>
+              <Image src="https://res.cloudinary.com/dbeuhgjct/image/upload/v1774345757/portfolio/rmyalnv7z8pu407jrn3k.webp" alt="Dr. Hemachandran K" width={400} height={600} className={styles.profileImage} />
+            </div>
             <div className={styles.bioSection}>
-              <h2 className={styles.name}>HEMACHANDRAN K</h2>
+              <h2 className={styles.name}>Dr. HEMACHANDRAN K</h2>
               <p className={styles.bio}>
                 Dr. Hemachandran Kannan is the Director of the AI Research Centre, Associate Dean of the School of Business, and Area Chair of the Analytics Department at Woxsen University. He serves as an ambassador for the AI Accelerator Institute and is a member of the advisory board for several international and national companies, including AptAI Labs (USA) and Agzitence Pvt. Ltd. He has been an effective resource person at various national and international scientific conferences and has delivered lectures on topics related to Artificial Intelligence. Currently, he serves as an expert at UNESCO and as an ATL Mentor of Change. His expertise encompasses Natural Language Processing, Computer Vision, Video Recommendation Systems, and Autonomous Robotics.
               </p>
@@ -74,16 +79,18 @@ export default function AboutPage() {
 
       {/* Affiliations */}
       <section className={`section ${styles.affiliations}`}>
-        <div className="container">
+        <div className="container" style={{ overflow: 'hidden' }}>
           <h2 className="section-title" style={{ textAlign: 'center', marginBottom: 40 }}>
             Members &amp; <span className="accent-text">Affiliations</span>
           </h2>
-          <div className={styles.logoRow}>
-            {affiliations.map((a, i) => (
-              <div key={i} className={styles.logoItem}>
-                <Image src={a.img} alt={a.name} width={120} height={50} style={{ objectFit: 'contain' }} />
-              </div>
-            ))}
+          <div className={styles.logoWrapper}>
+            <div className={styles.logoRow}>
+              {[...affiliations, ...affiliations].map((a: { _id: string, name: string, img: string }, i: number) => (
+                <div key={`${a._id || i}-${i}`} className={styles.logoItem}>
+                  <Image src={a.img} alt={a.name} width={200} height={100} style={{ objectFit: 'contain' }} />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

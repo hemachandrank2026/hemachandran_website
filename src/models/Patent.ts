@@ -1,15 +1,21 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose from 'mongoose';
 
-export interface IPatent extends Document {
+export interface IPatent {
   title: string;
-  description?: string;
   date?: string;
+  link?: string;
+  order?: number;
+  createdAt?: Date;
 }
 
-const PatentSchema: Schema = new Schema({
-  title: { type: String, required: true },
-  description: { type: String },
-  date: { type: String },
-}, { timestamps: true });
+const PatentSchema = new mongoose.Schema<IPatent>(
+  {
+    title: { type: String, required: true },
+    date: { type: String },
+    link: { type: String },
+    order: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+);
 
 export default mongoose.models.Patent || mongoose.model<IPatent>('Patent', PatentSchema);
