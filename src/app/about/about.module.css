@@ -1,0 +1,81 @@
+.aboutGrid {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.name {
+  font-size: 2.2rem;
+  margin-bottom: 20px;
+  color: var(--accent);
+}
+
+.bio {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.9;
+  margin-bottom: 32px;
+}
+
+.subHeading {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  margin-top: 32px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--accent);
+  display: inline-block;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+}
+
+.list li {
+  position: relative;
+  padding-left: 24px;
+  margin-bottom: 10px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.list li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: bold;
+}
+
+/* Affiliations */
+.affiliations {
+  background: var(--bg-secondary);
+}
+
+.logoRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  align-items: center;
+}
+
+.logoItem {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px 24px;
+  transition: all 0.3s ease;
+}
+
+.logoItem:hover {
+  border-color: var(--accent);
+  transform: scale(1.05);
+}
+
+.logoItem img {
+  height: 50px;
+  object-fit: contain;
+  filter: brightness(0.9);
+}

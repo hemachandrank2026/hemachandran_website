@@ -1,65 +1,100 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { ArrowRight, BookOpen, FlaskConical, Mic, Linkedin } from 'lucide-react';
+import styles from './page.module.css';
+
+const focusAreas = [
+  { icon: '🤖', title: 'Artificial Intelligence & ML', desc: 'Deep expertise in AI systems, machine learning algorithms, and their real-world applications.' },
+  { icon: '🧠', title: 'Natural Language Processing', desc: 'Building intelligent systems that understand and process human language.' },
+  { icon: '👁️', title: 'Computer Vision', desc: 'Developing visual perception systems for healthcare, security, and robotics.' },
+  { icon: '📊', title: 'Business Analytics', desc: 'Data-driven decision making for enterprises through advanced analytical frameworks.' },
+  { icon: '🤖', title: 'Autonomous Robotics', desc: 'Pioneering research in necrobotics and AI-driven autonomous systems.' },
+  { icon: '🏫', title: 'Industry-Academia', desc: 'Bridging the gap between academic research and real-world industry applications.' },
+];
+
+const socialLinks = [
+  { href: 'https://airc.woxsen.edu.in/', label: 'AI Research Centre' },
+  { href: 'https://www.linkedin.com/in/drhemachandrank/', label: 'LinkedIn' },
+  { href: 'https://scholar.google.co.in/citations?user=xGa-DEcAAAAJ&hl=en', label: 'Google Scholar' },
+  { href: 'https://www.researchgate.net/profile/Kannan-Hemachandran', label: 'ResearchGate' },
+];
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <>
+      {/* Hero Section */}
+      <section className={styles.hero}>
+        <div className={styles.heroContent}>
+          <p className={styles.heroTag}>Director of AI Research Centre</p>
+          <h1 className={styles.heroTitle}>
+            Dr. Hemachandran <span className={styles.accent}>K</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className={styles.heroDesc}>
+            Associate Dean of Business School &amp; Area Chair of Analytics at <strong>Woxsen University</strong>.
+            Ambassador for AI Accelerator Institute. UNESCO Expert &amp; ATL Mentor of Change.
           </p>
+          <div className={styles.heroBtns}>
+            <Link href="/about" className="btn btn-primary">
+              About Me <ArrowRight size={18} />
+            </Link>
+            <Link href="/contact" className="btn btn-outline">
+              Get in Touch
+            </Link>
+          </div>
+          <div className={styles.socialRow}>
+            {socialLinks.map((s) => (
+              <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                {s.label}
+              </a>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* Focus Areas */}
+      <section className="section">
+        <div className="container">
+          <p className={styles.sectionTag}>What I Do</p>
+          <h2 className="section-title">Focus <span className="accent-text">Areas</span></h2>
+          <p className="section-subtitle" style={{ marginBottom: 40 }}>
+            Exploring the intersection of technology and business through research, innovation, and education.
+          </p>
+          <div className="grid-3">
+            {focusAreas.map((area, i) => (
+              <div key={i} className="card">
+                <span className={styles.cardIcon}>{area.icon}</span>
+                <h3 className={styles.cardTitle}>{area.title}</h3>
+                <p className={styles.cardDesc}>{area.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* Quick Links */}
+      <section className={`section ${styles.quickLinks}`}>
+        <div className="container">
+          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: 40 }}>
+            Explore <span className="accent-text">More</span>
+          </h2>
+          <div className="grid-3">
+            <Link href="/books" className={styles.quickCard}>
+              <BookOpen size={32} className={styles.quickIcon} />
+              <h3>Books &amp; Publications</h3>
+              <p>Browse an extensive collection of authored and edited books published by Springer, Routledge, and more.</p>
+            </Link>
+            <Link href="/research" className={styles.quickCard}>
+              <FlaskConical size={32} className={styles.quickIcon} />
+              <h3>Research Gallery</h3>
+              <p>Explore journals, conference papers, and articles spanning AI, healthcare, and business analytics.</p>
+            </Link>
+            <Link href="/contributions" className={styles.quickCard}>
+              <Mic size={32} className={styles.quickIcon} />
+              <h3>Speaking &amp; Contributions</h3>
+              <p>View international speaking engagements, keynotes, and panel sessions across the globe.</p>
+            </Link>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

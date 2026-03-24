@@ -1,0 +1,145 @@
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 24px 80px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(249, 180, 1, 0.06) 0%, transparent 60%);
+}
+
+.heroContent {
+  max-width: 750px;
+}
+
+.heroTag {
+  display: inline-block;
+  padding: 6px 18px;
+  background: rgba(249, 180, 1, 0.12);
+  border: 1px solid rgba(249, 180, 1, 0.25);
+  border-radius: 50px;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  letter-spacing: 0.5px;
+}
+
+.heroTitle {
+  font-size: 4rem;
+  font-weight: 900;
+  margin-bottom: 20px;
+  letter-spacing: -1px;
+}
+
+.accent {
+  color: var(--accent);
+}
+
+.heroDesc {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 32px;
+}
+
+.heroBtns {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.socialRow {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.socialLink {
+  color: var(--text-muted) !important;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 4px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 50px;
+  transition: var(--transition);
+}
+
+.socialLink:hover {
+  border-color: var(--accent);
+  color: var(--accent) !important;
+}
+
+/* Section Tag */
+.sectionTag {
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+/* Card Styles */
+.cardIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.cardTitle {
+  font-size: 1.15rem;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+
+.cardDesc {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* Quick Links */
+.quickLinks {
+  background: var(--bg-secondary);
+}
+
+.quickCard {
+  display: block;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 40px 28px;
+  text-align: center;
+  transition: all 0.3s ease;
+  color: var(--text-primary) !important;
+}
+
+.quickCard:hover {
+  border-color: var(--accent);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(249, 180, 1, 0.1);
+}
+
+.quickCard h3 {
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+}
+
+.quickCard p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.quickIcon {
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .heroTitle { font-size: 2.5rem; }
+  .heroBtns { flex-direction: column; align-items: center; }
+}
