@@ -2,17 +2,19 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Book from '@/models/Book';
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   await dbConnect();
+  const { id } = await params;
   const data = await request.json();
-  const book = await Book.findByIdAndUpdate(params.id, data, { new: true });
+  const book = await Book.findByIdAndUpdate(id, data, { new: true });
   if (!book) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json(book);
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   await dbConnect();
-  const book = await Book.findByIdAndDelete(params.id);
+  const { id } = await params;
+  const book = await Book.findByIdAndDelete(id);
   if (!book) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ message: 'Deleted' });
 }
