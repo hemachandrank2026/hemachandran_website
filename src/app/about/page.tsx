@@ -11,26 +11,9 @@ const roles = [
   'EIC Accelerator Evaluator',
 ];
 
-const patents = [
-  'Nano-based Necrobotics Deployment',
-  'UHIS: Unified Healthcare Intelligence System',
-  'UAIS: Unified Agricultural Intelligence System',
-  'The Behavioral GPS',
-  'Predictive Modeling in Football Talent Identification and Performance Optimization',
-  'Quantum AI-Driven Smart Airport Management System',
-  'Quantum-AI Powered Electoral Forecasting and Governmental Stability Risk Assessment System',
-  'AI-Powered Predictive Infrastructure Management System for Large-Scale Operations',
-  'Quantum AI-Based Historical Reconstruction System',
-  'AI-Driven Neuroadaptive Smart City System Using Real-Time Cognitive and Behavioral Feedback',
-  'AI-Driven Neuro-Adaptive Interface for Real-Time Cognitive Load Balancing in Digital Environments',
-  'AI-Powered Hyper-Personalized Learning Track System for Student Classification and Adaptive Education',
-  'AI-Driven Bio-Induced Necrobotic System for Minimally Invasive Surgical Interventions',
-  'AI-Powered Bias Detection and Cognitive Debiasing System for Human and Algorithmic Decision-Making',
-  'AI-Driven Multi-Modal Cognitive-Affective Consumer Decision Influence System for Ethical & Adaptive Retail Experiences',
-];
-
 import dbConnect from '@/lib/mongodb';
 import Affiliation from '@/models/Affiliation';
+import Patent, { IPatent } from '@/models/Patent';
 
 async function getAffiliations() {
   try {
@@ -42,8 +25,19 @@ async function getAffiliations() {
   }
 }
 
+async function getPatents() {
+  try {
+    await dbConnect();
+    const pats = await Patent.find({}).sort({ order: 1, createdAt: -1 }).lean();
+    return JSON.parse(JSON.stringify(pats));
+  } catch {
+    return [];
+  }
+}
+
 export default async function AboutPage() {
   const affiliations = await getAffiliations();
+  const patents = await getPatents();
   return (
     <>
       <div className="page-banner">
@@ -58,7 +52,7 @@ export default async function AboutPage() {
               <Image src="https://res.cloudinary.com/dbeuhgjct/image/upload/v1774345757/portfolio/rmyalnv7z8pu407jrn3k.webp" alt="Dr. Hemachandran K" width={400} height={600} className={styles.profileImage} />
             </div>
             <div className={styles.bioSection}>
-              <h2 className={styles.name}>Dr. HEMACHANDRAN K</h2>
+              <h2 className={styles.name}>DR. HEMACHANDRAN K</h2>
               <p className={styles.bio}>
                 Dr. Hemachandran Kannan is the Director of the AI Research Centre, Associate Dean of the School of Business, and Area Chair of the Analytics Department at Woxsen University. He serves as an ambassador for the AI Accelerator Institute and is a member of the advisory board for several international and national companies, including AptAI Labs (USA) and Agzitence Pvt. Ltd. He has been an effective resource person at various national and international scientific conferences and has delivered lectures on topics related to Artificial Intelligence. Currently, he serves as an expert at UNESCO and as an ATL Mentor of Change. His expertise encompasses Natural Language Processing, Computer Vision, Video Recommendation Systems, and Autonomous Robotics.
               </p>
@@ -70,7 +64,11 @@ export default async function AboutPage() {
 
               <h3 className={styles.subHeading}>Principal Investigator &amp; Creator of (Patented)</h3>
               <ul className={styles.list}>
-                {patents.map((p, i) => <li key={i}>{p}</li>)}
+                {patents.map((p: IPatent & { _id: string }) => (
+                  <li key={p._id}>
+                    {p.link ? <a href={p.link} target="_blank" rel="noopener noreferrer" style={{color: 'inherit'}}>{p.title}</a> : p.title}
+                  </li>
+                ))}
               </ul>
             </div>
           </div>

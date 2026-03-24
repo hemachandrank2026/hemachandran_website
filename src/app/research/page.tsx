@@ -1,23 +1,25 @@
 import Link from 'next/link';
-import Image from 'next/image';
-import styles from './research.module.css';
 import dbConnect from '@/lib/mongodb';
-import Publication, { IPublication } from '@/models/Publication';
+import Publication from '@/models/Publication';
+import Patent from '@/models/Patent';
+import ResearchTabs from '@/components/ResearchTabs';
 
-async function getPublications() {
+async function getData() {
   try {
     await dbConnect();
     const pubs = await Publication.find({}).sort({ createdAt: -1 }).lean();
-    return JSON.parse(JSON.stringify(pubs));
+    const pats = await Patent.find({}).sort({ order: 1, createdAt: -1 }).lean();
+    return {
+      publications: JSON.parse(JSON.stringify(pubs)),
+      patents: JSON.parse(JSON.stringify(pats)),
+    };
   } catch {
-    return [];
+    return { publications: [], patents: [] };
   }
 }
 
 export default async function ResearchPage() {
-  const publications = await getPublications();
-  const journals = publications.filter((p: IPublication & { _id: string }) => p.type === 'Journal');
-  const articles = publications.filter((p: IPublication & { _id: string }) => p.type === 'Article');
+  const { publications, patents } = await getData();
 
   return (
     <>
@@ -28,52 +30,7 @@ export default async function ResearchPage() {
 
       <section className="section">
         <div className="container">
-          {publications.length === 0 ? (
-            <p style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: 40 }}>
-              No publications found. Add publications via the Admin Dashboard.
-            </p>
-          ) : (
-            <>
-              {/* Journals */}
-              {journals.length > 0 && (
-                <>
-                  <h2 className={styles.categoryTitle}>Journals</h2>
-                  <div className={styles.pubList}>
-                    {journals.map((pub: IPublication & { _id: string }) => (
-                      <div key={pub._id} className={styles.pubItem}>
-                        <div className={styles.pubDot} />
-                        <div>
-                          <a href={pub.link} target="_blank" rel="noopener noreferrer" className={styles.pubTitle}>
-                            {pub.title}
-                          </a>
-                          <p className={styles.pubAuthors}>{pub.authors}</p>
-                          <p className={styles.pubDate}>{pub.date}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {/* Articles */}
-              {articles.length > 0 && (
-                <>
-                  <h2 className={styles.categoryTitle} style={{ marginTop: 60 }}>Articles</h2>
-                  <div className="grid-3">
-                    {articles.map((pub: IPublication & { _id: string }) => (
-                      <a key={pub._id} href={pub.link} target="_blank" rel="noopener noreferrer" className={styles.articleCard}>
-                        {pub.thumbnail && <Image src={pub.thumbnail} alt={pub.title} className={styles.articleImg} width={400} height={180} style={{ objectFit: 'cover' }} />}
-                        <div className={styles.articleBody}>
-                          <h3>{pub.title}</h3>
-                          {pub.description && <p>{pub.description}</p>}
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                </>
-              )}
-            </>
-          )}
+          <ResearchTabs publications={publications} patents={patents} />
         </div>
       </section>
     </>

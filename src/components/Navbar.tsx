@@ -22,7 +22,7 @@ export default function Navbar() {
     <header className={styles.header}>
       <div className={styles.container}>
         <Link href="/" className={styles.logo}>
-          Hemachandran <span>K</span>
+          <span>Dr.</span> Hemachandran <span>K</span>
         </Link>
         <button className={styles.menuBtn} onClick={() => setIsOpen(!isOpen)} aria-label="Toggle menu">
           {isOpen ? <X size={24} /> : <Menu size={24} />}

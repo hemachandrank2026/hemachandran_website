@@ -28,7 +28,7 @@ export default function Home() {
             <img src="https://res.cloudinary.com/dbeuhgjct/image/upload/v1774345756/portfolio/ohrc69ohfkspk9s472da.webp" alt="Dr. Hemachandran K" />
           </div>
           <div className={styles.heroContent}>
-          <p className={styles.heroTag}>Director of AI Research Centre</p>
+          <p className={styles.heroTag}>Director of AI Research Centre, Woxsen University</p>
           <h1 className={styles.heroTitle}>
             Dr. Hemachandran <span className={styles.accent}>K</span>
           </h1>

@@ -2,10 +2,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { BookOpen, FlaskConical, LogOut, Plus, Trash2, Loader2, Users, UploadCloud, Edit2, X } from 'lucide-react';
+import { BookOpen, FlaskConical, LogOut, Plus, Trash2, Loader2, Users, UploadCloud, Edit2, X, Shield } from 'lucide-react';
 import styles from './admin.module.css';
+import Pagination from '@/components/Pagination';
 
-type Tab = 'books' | 'publications' | 'affiliations';
+type Tab = 'books' | 'publications' | 'affiliations' | 'patents';
+
+interface PatentItem {
+  _id: string;
+  title: string;
+  date?: string;
+  link?: string;
+  order?: number;
+}
 
 interface AffiliationItem {
   _id: string;
@@ -36,6 +45,8 @@ interface PubItem {
   description?: string;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -43,9 +54,16 @@ export default function AdminDashboard() {
   const [books, setBooks] = useState<BookItem[]>([]);
   const [publications, setPublications] = useState<PubItem[]>([]);
   const [affiliations, setAffiliations] = useState<AffiliationItem[]>([]);
+  const [patents, setPatents] = useState<PatentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+
+  // Pagination states
+  const [bookPage, setBookPage] = useState(1);
+  const [pubPage, setPubPage] = useState(1);
+  const [affilPage, setAffilPage] = useState(1);
+  const [patPage, setPatPage] = useState(1);
 
   // Book form state
   const [bookForm, setBookForm] = useState({
@@ -62,11 +80,17 @@ export default function AdminDashboard() {
     name: '', img: '', order: 0
   });
 
+  // Patent form state
+  const [patentForm, setPatentForm] = useState({
+    title: '', date: '', link: '', order: 0
+  });
+
   const resetForms = () => {
     setEditingId(null);
     setBookForm({ title: '', publisher: '', publishedDate: '', coverImage: '', amazonLink: '', publisherLink: '', format: 'Paperback' });
     setPubForm({ title: '', authors: '', date: '', link: '', type: 'Journal', thumbnail: '', description: '' });
     setAffilForm({ name: '', img: '', order: 0 });
+    setPatentForm({ title: '', date: '', link: '', order: 0 });
   };
 
   const handleTabChange = (t: Tab) => {
@@ -93,15 +117,17 @@ export default function AdminDashboard() {
   };
 
   const loadData = useCallback(async () => {
-    const [bRes, pRes, aRes] = await Promise.all([
+    const [bRes, pRes, aRes, patRes] = await Promise.all([
       fetch('/api/books'),
       fetch('/api/publications'),
       fetch('/api/affiliations'),
+      fetch('/api/patents'),
     ]);
     const booksData = await bRes.json();
     const pubsData = await pRes.json();
     const affilData = await aRes.json();
-    return { books: booksData, pubs: pubsData, affils: affilData };
+    const patData = await patRes.json();
+    return { books: booksData, pubs: pubsData, affils: affilData, pats: patData };
   }, []);
 
   useEffect(() => {
@@ -111,11 +137,12 @@ export default function AdminDashboard() {
     }
     if (status === 'authenticated') {
       let cancelled = false;
-      loadData().then(({ books: b, pubs: p, affils: a }: { books: BookItem[]; pubs: PubItem[]; affils: AffiliationItem[] }) => {
+      loadData().then(({ books: b, pubs: p, affils: a, pats: pt }: { books: BookItem[]; pubs: PubItem[]; affils: AffiliationItem[]; pats: PatentItem[] }) => {
         if (!cancelled) {
           setBooks(b);
           setPublications(p);
           setAffiliations(a);
+          setPatents(pt);
           setLoading(false);
         }
       });
@@ -129,9 +156,11 @@ export default function AdminDashboard() {
     setBooks(data.books);
     setPublications(data.pubs);
     setAffiliations(data.affils);
+    setPatents(data.pats);
     setLoading(false);
   };
 
+  // --- Books CRUD ---
   const saveBook = async (e: React.FormEvent) => {
     e.preventDefault();
     const url = editingId ? `/api/books/${editingId}` : '/api/books';
@@ -140,19 +169,18 @@ export default function AdminDashboard() {
     resetForms();
     refreshData();
   };
-
   const startEditBook = (b: BookItem) => {
     setBookForm({ ...b, amazonLink: b.amazonLink || '', publisherLink: b.publisherLink || '' });
     setEditingId(b._id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
   const deleteBook = async (id: string) => {
     if (!confirm('Delete this book?')) return;
     await fetch(`/api/books/${id}`, { method: 'DELETE' });
     refreshData();
   };
 
+  // --- Publications CRUD ---
   const savePub = async (e: React.FormEvent) => {
     e.preventDefault();
     const url = editingId ? `/api/publications/${editingId}` : '/api/publications';
@@ -161,19 +189,18 @@ export default function AdminDashboard() {
     resetForms();
     refreshData();
   };
-
   const startEditPub = (p: PubItem) => {
     setPubForm({ ...p, thumbnail: p.thumbnail || '', description: p.description || '' });
     setEditingId(p._id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
   const deletePub = async (id: string) => {
     if (!confirm('Delete this publication?')) return;
     await fetch(`/api/publications/${id}`, { method: 'DELETE' });
     refreshData();
   };
 
+  // --- Affiliations CRUD ---
   const saveAffiliation = async (e: React.FormEvent) => {
     e.preventDefault();
     const url = editingId ? `/api/affiliations/${editingId}` : '/api/affiliations';
@@ -182,16 +209,34 @@ export default function AdminDashboard() {
     resetForms();
     refreshData();
   };
-
   const startEditAffiliation = (a: AffiliationItem) => {
     setAffilForm({ ...a, order: a.order || 0 });
     setEditingId(a._id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
   const deleteAffiliation = async (id: string) => {
     if (!confirm('Delete this affiliation?')) return;
     await fetch(`/api/affiliations/${id}`, { method: 'DELETE' });
+    refreshData();
+  };
+
+  // --- Patents CRUD ---
+  const savePatent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const url = editingId ? `/api/patents/${editingId}` : '/api/patents';
+    const method = editingId ? 'PUT' : 'POST';
+    await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(patentForm) });
+    resetForms();
+    refreshData();
+  };
+  const startEditPatent = (p: PatentItem) => {
+    setPatentForm({ ...p, date: p.date || '', link: p.link || '', order: p.order || 0 });
+    setEditingId(p._id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const deletePatent = async (id: string) => {
+    if (!confirm('Delete this patent?')) return;
+    await fetch(`/api/patents/${id}`, { method: 'DELETE' });
     refreshData();
   };
 
@@ -227,9 +272,12 @@ export default function AdminDashboard() {
         <button className={`${styles.tab} ${activeTab === 'affiliations' ? styles.tabActive : ''}`} onClick={() => handleTabChange('affiliations')}>
           <Users size={18} /> Affiliations ({affiliations.length})
         </button>
+        <button className={`${styles.tab} ${activeTab === 'patents' ? styles.tabActive : ''}`} onClick={() => handleTabChange('patents')}>
+          <Shield size={18} /> Patents ({patents.length})
+        </button>
       </div>
 
-      {/* Books Tab */}
+      {/* ═══════════════ Books Tab ═══════════════ */}
       {activeTab === 'books' && (
         <div className={styles.content}>
           <form onSubmit={saveBook} className={styles.addForm}>
@@ -241,7 +289,7 @@ export default function AdminDashboard() {
               <input placeholder="Title *" value={bookForm.title} onChange={e => setBookForm({...bookForm, title: e.target.value})} required />
               <input placeholder="Publisher *" value={bookForm.publisher} onChange={e => setBookForm({...bookForm, publisher: e.target.value})} required />
               <input placeholder="Published Date *" value={bookForm.publishedDate} onChange={e => setBookForm({...bookForm, publishedDate: e.target.value})} required />
-              
+
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center', backgroundColor: '#111', padding: '0 8px', borderRadius: '8px' }}>
                 <input style={{ background: 'transparent', border: 'none', padding: 0 }} placeholder="Cover Image URL *" value={bookForm.coverImage} onChange={e => setBookForm({...bookForm, coverImage: e.target.value})} required />
                 <label style={{ cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', padding: '4px 12px', background: 'var(--accent)', color: '#000', borderRadius: '4px', fontWeight: 'bold' }}>
@@ -257,7 +305,7 @@ export default function AdminDashboard() {
           </form>
 
           <div className={styles.itemList}>
-            {books.map((book: BookItem) => (
+            {books.slice((bookPage - 1) * ITEMS_PER_PAGE, bookPage * ITEMS_PER_PAGE).map((book) => (
               <div key={book._id} className={styles.item}>
                 <div>
                   <h4>{book.title}</h4>
@@ -270,10 +318,11 @@ export default function AdminDashboard() {
               </div>
             ))}
           </div>
+          <Pagination currentPage={bookPage} totalPages={Math.ceil(books.length / ITEMS_PER_PAGE)} onPageChange={setBookPage} />
         </div>
       )}
 
-      {/* Publications Tab */}
+      {/* ═══════════════ Publications Tab ═══════════════ */}
       {activeTab === 'publications' && (
         <div className={styles.content}>
           <form onSubmit={savePub} className={styles.addForm}>
@@ -302,14 +351,14 @@ export default function AdminDashboard() {
               ) : (
                 <input placeholder="Thumbnail URL (N/A for Journals)" value={pubForm.thumbnail} disabled style={{ opacity: 0.5 }} />
               )}
-              
+
               <input placeholder="Description (for Articles)" value={pubForm.description} onChange={e => setPubForm({...pubForm, description: e.target.value})} />
             </div>
             <button type="submit" className="btn btn-primary" style={{ marginTop: 12 }}>{editingId ? 'Save Changes' : 'Add Publication'}</button>
           </form>
 
           <div className={styles.itemList}>
-            {publications.map((pub: PubItem) => (
+            {publications.slice((pubPage - 1) * ITEMS_PER_PAGE, pubPage * ITEMS_PER_PAGE).map((pub) => (
               <div key={pub._id} className={styles.item}>
                 <div>
                   <h4>{pub.title}</h4>
@@ -322,10 +371,11 @@ export default function AdminDashboard() {
               </div>
             ))}
           </div>
+          <Pagination currentPage={pubPage} totalPages={Math.ceil(publications.length / ITEMS_PER_PAGE)} onPageChange={setPubPage} />
         </div>
       )}
 
-      {/* Affiliations Tab */}
+      {/* ═══════════════ Affiliations Tab ═══════════════ */}
       {activeTab === 'affiliations' && (
         <div className={styles.content}>
           <form onSubmit={saveAffiliation} className={styles.addForm}>
@@ -335,7 +385,7 @@ export default function AdminDashboard() {
             </div>
             <div className={styles.formGrid}>
               <input placeholder="Name *" value={affilForm.name} onChange={e => setAffilForm({...affilForm, name: e.target.value})} required />
-              
+
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center', backgroundColor: '#111', padding: '0 8px', borderRadius: '8px' }}>
                 <input style={{ background: 'transparent', border: 'none', padding: 0 }} placeholder="Image URL *" value={affilForm.img} onChange={e => setAffilForm({...affilForm, img: e.target.value})} required />
                 <label style={{ cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', padding: '4px 12px', background: 'var(--accent)', color: '#000', borderRadius: '4px', fontWeight: 'bold' }}>
@@ -350,7 +400,7 @@ export default function AdminDashboard() {
           </form>
 
           <div className={styles.itemList}>
-            {affiliations.map((affil: AffiliationItem) => (
+            {affiliations.slice((affilPage - 1) * ITEMS_PER_PAGE, affilPage * ITEMS_PER_PAGE).map((affil) => (
               <div key={affil._id} className={styles.item}>
                 <div>
                   <h4>{affil.name}</h4>
@@ -363,6 +413,42 @@ export default function AdminDashboard() {
               </div>
             ))}
           </div>
+          <Pagination currentPage={affilPage} totalPages={Math.ceil(affiliations.length / ITEMS_PER_PAGE)} onPageChange={setAffilPage} />
+        </div>
+      )}
+
+      {/* ═══════════════ Patents Tab ═══════════════ */}
+      {activeTab === 'patents' && (
+        <div className={styles.content}>
+          <form onSubmit={savePatent} className={styles.addForm}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3>{editingId ? <><Edit2 size={18} /> Edit Patent</> : <><Plus size={18} /> Add New Patent</>}</h3>
+              {editingId && <button type="button" onClick={resetForms} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}><X size={20} /></button>}
+            </div>
+            <div className={styles.formGrid}>
+              <input placeholder="Patent Title *" value={patentForm.title} onChange={e => setPatentForm({...patentForm, title: e.target.value})} required />
+              <input placeholder="Date (Optional)" value={patentForm.date} onChange={e => setPatentForm({...patentForm, date: e.target.value})} />
+              <input placeholder="Link URL (Optional)" value={patentForm.link} onChange={e => setPatentForm({...patentForm, link: e.target.value})} />
+              <input type="number" placeholder="Sort Order" value={patentForm.order} onChange={e => setPatentForm({...patentForm, order: parseInt(e.target.value) || 0})} />
+            </div>
+            <button type="submit" className="btn btn-primary" style={{ marginTop: 12 }}>{editingId ? 'Save Changes' : 'Add Patent'}</button>
+          </form>
+
+          <div className={styles.itemList}>
+            {patents.slice((patPage - 1) * ITEMS_PER_PAGE, patPage * ITEMS_PER_PAGE).map((pat) => (
+              <div key={pat._id} className={styles.item}>
+                <div>
+                  <h4>{pat.title}</h4>
+                  <p>{pat.date} {pat.link && <span>· <a href={pat.link} target="_blank" rel="noreferrer" style={{color: 'var(--accent)'}}>Link</a></span>}</p>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button onClick={() => startEditPatent(pat)} className={styles.deleteBtn} style={{ color: 'var(--accent)' }}><Edit2 size={16} /></button>
+                  <button onClick={() => deletePatent(pat._id)} className={styles.deleteBtn}><Trash2 size={16} /></button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <Pagination currentPage={patPage} totalPages={Math.ceil(patents.length / ITEMS_PER_PAGE)} onPageChange={setPatPage} />
         </div>
       )}
     </div>
