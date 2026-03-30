@@ -16,6 +16,7 @@ const roles = [
 import dbConnect from '@/lib/mongodb';
 import Affiliation from '@/models/Affiliation';
 import Patent, { IPatent } from '@/models/Patent';
+import Settings from '@/models/Settings';
 
 async function getAffiliations() {
   try {
@@ -40,6 +41,10 @@ async function getPatents() {
 export default async function AboutPage() {
   const affiliations = await getAffiliations();
   const patents = await getPatents();
+  await dbConnect();
+  const settings = await Settings.findOne() || { aboutImage: 'https://res.cloudinary.com/dbeuhgjct/image/upload/v1774345757/portfolio/rmyalnv7z8pu407jrn3k.webp' };
+  const aboutImage = settings.aboutImage || 'https://res.cloudinary.com/dbeuhgjct/image/upload/v1774345757/portfolio/rmyalnv7z8pu407jrn3k.webp';
+
   return (
     <>
       <div className="page-banner">
@@ -51,7 +56,7 @@ export default async function AboutPage() {
         <div className="container">
           <div className={styles.aboutGrid}>
             <div className={styles.imageCard}>
-              <Image src="https://res.cloudinary.com/dbeuhgjct/image/upload/v1774345757/portfolio/rmyalnv7z8pu407jrn3k.webp" alt="Dr. Hemachandran K" width={400} height={600} className={styles.profileImage} />
+              <Image src={aboutImage} alt="Dr. Hemachandran K" width={400} height={600} className={styles.profileImage} />
             </div>
             <div className={styles.bioSection}>
               <h2 className={styles.name}>DR. HEMACHANDRAN K</h2>

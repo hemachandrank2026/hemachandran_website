@@ -2,11 +2,24 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { BookOpen, FlaskConical, LogOut, Plus, Trash2, Loader2, Users, UploadCloud, Edit2, X, Shield } from 'lucide-react';
+import { BookOpen, FlaskConical, LogOut, Plus, Trash2, Loader2, Users, UploadCloud, Edit2, X, Shield, Settings as SettingsIcon, Key } from 'lucide-react';
 import styles from './admin.module.css';
 import Pagination from '@/components/Pagination';
 
-type Tab = 'books' | 'publications' | 'affiliations' | 'patents';
+type Tab = 'books' | 'publications' | 'affiliations' | 'patents' | 'settings' | 'security';
+
+interface SettingsItem {
+  homeImage: string;
+  aboutImage: string;
+  counts: {
+    patents: number;
+    books: number;
+    articles: number;
+    keynotes: number;
+    partnerships: number;
+    fellows: number;
+  };
+}
 
 interface PatentItem {
   _id: string;
@@ -58,6 +71,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [settings, setSettings] = useState<SettingsItem | null>(null);
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
 
   // Pagination states
   const [bookPage, setBookPage] = useState(1);
@@ -117,17 +132,19 @@ export default function AdminDashboard() {
   };
 
   const loadData = useCallback(async () => {
-    const [bRes, pRes, aRes, patRes] = await Promise.all([
+    const [bRes, pRes, aRes, patRes, setRes] = await Promise.all([
       fetch('/api/books'),
       fetch('/api/publications'),
       fetch('/api/affiliations'),
       fetch('/api/patents'),
+      fetch('/api/settings'),
     ]);
     const booksData = await bRes.json();
     const pubsData = await pRes.json();
     const affilData = await aRes.json();
     const patData = await patRes.json();
-    return { books: booksData, pubs: pubsData, affils: affilData, pats: patData };
+    const setData = await setRes.json();
+    return { books: booksData, pubs: pubsData, affils: affilData, pats: patData, settingsData: setData };
   }, []);
 
   useEffect(() => {
@@ -137,12 +154,13 @@ export default function AdminDashboard() {
     }
     if (status === 'authenticated') {
       let cancelled = false;
-      loadData().then(({ books: b, pubs: p, affils: a, pats: pt }: { books: BookItem[]; pubs: PubItem[]; affils: AffiliationItem[]; pats: PatentItem[] }) => {
+      loadData().then(({ books: b, pubs: p, affils: a, pats: pt, settingsData: s }: { books: BookItem[]; pubs: PubItem[]; affils: AffiliationItem[]; pats: PatentItem[]; settingsData: SettingsItem | null }) => {
         if (!cancelled) {
           setBooks(b);
           setPublications(p);
           setAffiliations(a);
           setPatents(pt);
+          setSettings(s);
           setLoading(false);
         }
       });
@@ -157,6 +175,7 @@ export default function AdminDashboard() {
     setPublications(data.pubs);
     setAffiliations(data.affils);
     setPatents(data.pats);
+    setSettings(data.settingsData);
     setLoading(false);
   };
 
@@ -240,6 +259,40 @@ export default function AdminDashboard() {
     refreshData();
   };
 
+  // --- Settings & Security ---
+  const saveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settings) });
+    alert('Settings saved successfully!');
+    refreshData();
+  };
+
+  const changePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+    const userExt = session?.user as { username?: string; name?: string } | undefined;
+    const username = userExt?.username || userExt?.name || 'admin';
+    const res = await fetch('/api/admin/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword
+      })
+    });
+    if (res.ok) {
+      alert('Password updated successfully');
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } else {
+      const data = await res.json();
+      alert(`Error: ${data.error}`);
+    }
+  };
+
   if (status === 'loading' || loading) {
     return (
       <div className={styles.page}>
@@ -274,6 +327,12 @@ export default function AdminDashboard() {
         </button>
         <button className={`${styles.tab} ${activeTab === 'patents' ? styles.tabActive : ''}`} onClick={() => handleTabChange('patents')}>
           <Shield size={18} /> Patents ({patents.length})
+        </button>
+        <button className={`${styles.tab} ${activeTab === 'settings' ? styles.tabActive : ''}`} onClick={() => handleTabChange('settings')}>
+          <SettingsIcon size={18} /> Settings
+        </button>
+        <button className={`${styles.tab} ${activeTab === 'security' ? styles.tabActive : ''}`} onClick={() => handleTabChange('security')}>
+          <Key size={18} /> Security
         </button>
       </div>
 
@@ -451,6 +510,62 @@ export default function AdminDashboard() {
           <Pagination currentPage={patPage} totalPages={Math.ceil(patents.length / ITEMS_PER_PAGE)} onPageChange={setPatPage} />
         </div>
       )}
+
+      {/* ═══════════════ Settings Tab ═══════════════ */}
+      {activeTab === 'settings' && settings && (
+        <div className={styles.content}>
+          <form onSubmit={saveSettings} className={styles.addForm}>
+            <h3><SettingsIcon size={18} /> Site Settings & Dynamic Counts</h3>
+            <div className={styles.formGrid}>
+              
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', backgroundColor: '#111', padding: '0 8px', borderRadius: '8px' }}>
+                <input style={{ background: 'transparent', border: 'none', padding: 0 }} placeholder="Home Page Image URL *" value={settings.homeImage} onChange={e => setSettings({...settings, homeImage: e.target.value})} required />
+                <label style={{ cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', padding: '4px 12px', background: 'var(--accent)', color: '#000', borderRadius: '4px', fontWeight: 'bold' }}>
+                  {uploading ? <Loader2 size={14} className={styles.spin} /> : <UploadCloud size={14} />} Upload
+                  <input type="file" accept="image/*" hidden onChange={(e) => handleImageUpload(e, (url) => setSettings({...settings, homeImage: url}))} />
+                </label>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', backgroundColor: '#111', padding: '0 8px', borderRadius: '8px' }}>
+                <input style={{ background: 'transparent', border: 'none', padding: 0 }} placeholder="About Page Image URL *" value={settings.aboutImage} onChange={e => setSettings({...settings, aboutImage: e.target.value})} required />
+                <label style={{ cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', padding: '4px 12px', background: 'var(--accent)', color: '#000', borderRadius: '4px', fontWeight: 'bold' }}>
+                  {uploading ? <Loader2 size={14} className={styles.spin} /> : <UploadCloud size={14} />} Upload
+                  <input type="file" accept="image/*" hidden onChange={(e) => handleImageUpload(e, (url) => setSettings({...settings, aboutImage: url}))} />
+                </label>
+              </div>
+              
+            </div>
+            <h4 style={{ marginTop: 24, marginBottom: 12 }}>Dynamic Counts</h4>
+            <div className={styles.formGrid}>
+              <input type="number" placeholder="Patents Count" value={settings.counts.patents} onChange={e => setSettings({...settings, counts: {...settings.counts, patents: parseInt(e.target.value) || 0}})} />
+              <input type="number" placeholder="Books Count" value={settings.counts.books} onChange={e => setSettings({...settings, counts: {...settings.counts, books: parseInt(e.target.value) || 0}})} />
+              <input type="number" placeholder="Articles Count" value={settings.counts.articles} onChange={e => setSettings({...settings, counts: {...settings.counts, articles: parseInt(e.target.value) || 0}})} />
+              <input type="number" placeholder="Keynotes Count" value={settings.counts.keynotes} onChange={e => setSettings({...settings, counts: {...settings.counts, keynotes: parseInt(e.target.value) || 0}})} />
+              <input type="number" placeholder="Partnerships Count" value={settings.counts.partnerships} onChange={e => setSettings({...settings, counts: {...settings.counts, partnerships: parseInt(e.target.value) || 0}})} />
+              <input type="number" placeholder="Fellows Count" value={settings.counts.fellows} onChange={e => setSettings({...settings, counts: {...settings.counts, fellows: parseInt(e.target.value) || 0}})} />
+            </div>
+            
+            <button type="submit" className="btn btn-primary" style={{ marginTop: 24 }}>Save Settings</button>
+          </form>
+        </div>
+      )}
+
+      {/* ═══════════════ Security Tab ═══════════════ */}
+      {activeTab === 'security' && (
+        <div className={styles.content}>
+          <form onSubmit={changePassword} className={styles.addForm}>
+            <h3><Key size={18} /> Change Admin Password</h3>
+            <div className={styles.formGrid}>
+              <input type="password" placeholder="Current Password *" value={passwordForm.currentPassword} onChange={e => setPasswordForm({...passwordForm, currentPassword: e.target.value})} required />
+              <input type="password" placeholder="New Password *" value={passwordForm.newPassword} onChange={e => setPasswordForm({...passwordForm, newPassword: e.target.value})} required />
+              <input type="password" placeholder="Confirm New Password *" value={passwordForm.confirmPassword} onChange={e => setPasswordForm({...passwordForm, confirmPassword: e.target.value})} required />
+            </div>
+            
+            <button type="submit" className="btn btn-primary" style={{ marginTop: 12 }}>Change Password</button>
+          </form>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -6,11 +6,11 @@ import { Menu, X } from 'lucide-react';
 import styles from './Navbar.module.css';
 
 const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/about', label: 'About' },
-  { href: '/research', label: 'Research' },
-  { href: '/books', label: 'Books' },
-  { href: '/contributions', label: 'Contributions' },
+  { href: '/speaking-workshops', label: 'Speaking & Workshops' },
+  { href: '/ai-consulting', label: 'AI Consulting' },
+  { href: '/leadership-advisory', label: 'Leadership & Advisory' },
+  { href: '/research', label: 'Research & Innovations' },
+  { href: '/books', label: 'Books & Publications' },
   { href: '/contact', label: 'Contact' },
 ];
 
