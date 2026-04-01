@@ -76,7 +76,7 @@ img {
   max-width: 600px;
 }
 
-.accent-text {
+.accent-text, .text-accent {
   color: var(--accent);
 }
 
@@ -247,3 +247,18 @@ img {
 .inline { display: inline; }
 .mr-1 { margin-right: 4px; }
 .mr-2 { margin-right: 8px; }
+
+.bulletList {
+  list-style: none;
+  padding-left: 1.75rem;
+}
+.bulletList li {
+  position: relative;
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+.bulletList li > svg {
+  position: absolute;
+  left: -1.75rem;
+  top: 4px;
+}

@@ -33,7 +33,7 @@ export default function BooksPageClientWrapper({
 
   return (
     <div style={{ paddingTop: '80px' }}>
-      <header style={{ padding: '80px 0 40px', textAlign: 'center', background: 'radial-gradient(ellipse at center, rgba(249, 180, 1, 0.05) 0%, transparent 60%)' }}>
+      <header style={{ padding: '20px 0 40px', textAlign: 'center', background: 'radial-gradient(ellipse at center, rgba(249, 180, 1, 0.05) 0%, transparent 60%)' }}>
         <div className="container max-w-4xl">
           <h1 className="hero-title">Books &amp; <span className="accent-text">Publications</span></h1>
           <p className="hero-desc">
@@ -42,7 +42,7 @@ export default function BooksPageClientWrapper({
         </div>
       </header>
 
-      <section className="section bg-secondary">
+      <section className="section bg-secondary" style={{ paddingTop: '10px' }}>
         <div className="container">
           <h2 className="section-title text-center mb-12">Start <span className="accent-text">Here</span></h2>
           <div className="grid-2">
@@ -74,20 +74,38 @@ export default function BooksPageClientWrapper({
           </div>
 
           <div className="grid-2 mt-8">
-            {currentData.slice(0, 15).map((item: any, idx) => (
-              <div key={idx} className="card bg-dark">
-                <h4 className="text-lg mb-2">{item.title}</h4>
-                {item.authors && <p className="text-sm text-muted mb-2">{item.authors}</p>}
-                {item.publisher && <p className="text-sm text-muted mb-2">{item.publisher} - {item.publishedDate}</p>}
-                {item.date && <p className="text-sm text-muted mb-2">{item.date}</p>}
-                
-                {(item.link || item.amazonLink) && (
-                  <a href={item.link || item.amazonLink} target="_blank" rel="noreferrer" className="text-accent text-sm font-bold flex gap-1 align-center mt-4 inline-flex">
-                    View Publication <ExternalLink size={14} />
+            {currentData.slice(0, 15).map((item: any, idx) => {
+              const hrefLink = item.link || item.amazonLink;
+              
+              const CardContent = (
+                <>
+                  <h4 className="text-lg mb-2">{item.title}</h4>
+                  {item.authors && <p className="text-sm text-muted mb-2">{item.authors}</p>}
+                  {item.publisher && <p className="text-sm text-muted mb-2">{item.publisher} - {item.publishedDate}</p>}
+                  {item.date && <p className="text-sm text-muted mb-2">{item.date}</p>}
+                  
+                  {hrefLink && (
+                    <span className="text-accent text-sm font-bold flex gap-1 align-center mt-4 inline-flex">
+                      View Publication <ExternalLink size={14} />
+                    </span>
+                  )}
+                </>
+              );
+
+              if (hrefLink) {
+                return (
+                  <a key={idx} href={hrefLink} target="_blank" rel="noreferrer" className="card bg-dark block" style={{ cursor: 'pointer', color: 'inherit', textDecoration: 'none' }}>
+                    {CardContent}
                   </a>
-                )}
-              </div>
-            ))}
+                );
+              }
+
+              return (
+                <div key={idx} className="card bg-dark">
+                  {CardContent}
+                </div>
+              );
+            })}
           </div>
           
           <div className="text-center mt-12">

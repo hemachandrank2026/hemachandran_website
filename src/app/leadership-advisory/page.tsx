@@ -27,7 +27,7 @@ export default async function LeadershipAdvisoryPage() {
         </div>
       </header>
 
-      <section className="section bg-secondary">
+      <section className="section bg-secondary" style={{ paddingTop: '10px' }}>
         <div className="container">
           <h2 className="section-title text-center mb-12">Current <span className="accent-text">Advisory Roles</span></h2>
           <div className="grid-2">
@@ -80,32 +80,32 @@ export default async function LeadershipAdvisoryPage() {
         <div className="container">
           <h2 className="section-title text-center mb-12">Value <span className="accent-text">Pillars</span></h2>
           <div className="grid-2 gap-8">
-            <div className="flex gap-6 items-start bg-dark p-6 rounded border border-gray hover-border-accent transition">
-              <Shield size={40} className="text-accent flex-shrink-0" />
+            <div className="card bg-dark flex flex-col gap-3">
+              <Shield size={40} className="text-accent mb-2" />
               <div>
                 <h4 className="text-lg font-bold mb-2">AI Strategy &amp; Governance</h4>
                 <p className="text-sm text-muted">Establishing corporate risk tolerance, algorithmic auditing protocols, and aligning enterprise AI with the EU AI Act.</p>
               </div>
             </div>
             
-            <div className="flex gap-6 items-start bg-dark p-6 rounded border border-gray hover-border-accent transition">
-              <BookOpen size={40} className="text-accent flex-shrink-0" />
+            <div className="card bg-dark flex flex-col gap-3">
+              <BookOpen size={40} className="text-accent mb-2" />
               <div>
                 <h4 className="text-lg font-bold mb-2">Regulatory &amp; Accreditation</h4>
                 <p className="text-sm text-muted">Aiding universities and training bodies in obtaining prestigious tech-accreditations (e.g., AACSB tech alignments).</p>
               </div>
             </div>
             
-            <div className="flex gap-6 items-start bg-dark p-6 rounded border border-gray hover-border-accent transition">
-              <Handshake size={40} className="text-accent flex-shrink-0" />
+            <div className="card bg-dark flex flex-col gap-3">
+              <Handshake size={40} className="text-accent mb-2" />
               <div>
                 <h4 className="text-lg font-bold mb-2">Industry-Academia Partnerships</h4>
                 <p className="text-sm text-muted">Securing joint funding models, building corporate labs on campuses, and converting research IP into commercial ventures.</p>
               </div>
             </div>
 
-            <div className="flex gap-6 items-start bg-dark p-6 rounded border border-gray hover-border-accent transition">
-              <Network size={40} className="text-accent flex-shrink-0" />
+            <div className="card bg-dark flex flex-col gap-3">
+              <Network size={40} className="text-accent mb-2" />
               <div>
                 <h4 className="text-lg font-bold mb-2">Program &amp; Curriculum Innovation</h4>
                 <p className="text-sm text-muted">Overhauling legacy analytics programs with LLM, quantum computing concepts, and executive readiness training.</p>

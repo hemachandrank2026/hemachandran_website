@@ -92,7 +92,7 @@ function ContactForm() {
 export default function ContactPage() {
   return (
     <div style={{ paddingTop: '80px' }}>
-      <header style={{ padding: '80px 0 40px', textAlign: 'center', background: 'radial-gradient(ellipse at center, rgba(249, 180, 1, 0.05) 0%, transparent 60%)' }}>
+      <header style={{ padding: '20px 0 40px', textAlign: 'center', background: 'radial-gradient(ellipse at center, rgba(249, 180, 1, 0.05) 0%, transparent 60%)' }}>
         <div className="container max-w-4xl">
           <h1 className="hero-title">Start a <span className="accent-text">Conversation</span></h1>
           <p className="hero-desc">
@@ -101,7 +101,7 @@ export default function ContactPage() {
         </div>
       </header>
 
-      <section className="section bg-secondary">
+      <section className="section bg-secondary" style={{ paddingTop: '10px' }}>
         <div className="container">
           <div className={styles.contactGrid}>
             

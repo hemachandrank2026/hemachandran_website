@@ -1,4 +1,4 @@
-import { Cpu, Plane, Map, Monitor, Scale, BarChart, ExternalLink } from 'lucide-react';
+import { Cpu, Plane, Map, Monitor, Scale, BarChart, ExternalLink, Network, Building, GraduationCap, Tractor } from 'lucide-react';
 
 export const metadata = {
   title: 'Research & Innovations | Dr. Hemachandran K',
@@ -8,7 +8,7 @@ export const metadata = {
 export default function ResearchPage() {
   return (
     <div style={{ paddingTop: '80px' }}>
-      <header style={{ padding: '80px 0 40px', textAlign: 'center', background: 'radial-gradient(ellipse at center, rgba(249, 180, 1, 0.05) 0%, transparent 60%)' }}>
+      <header style={{ padding: '20px 0 40px', textAlign: 'center', background: 'radial-gradient(ellipse at center, rgba(249, 180, 1, 0.05) 0%, transparent 60%)' }}>
         <div className="container max-w-4xl">
           <h1 className="hero-title">Research &amp; <span className="accent-text">Innovations</span></h1>
           <p className="hero-desc">
@@ -17,7 +17,7 @@ export default function ResearchPage() {
         </div>
       </header>
 
-      <section className="section bg-secondary">
+      <section className="section bg-secondary" style={{ paddingTop: '10px' }}>
         <div className="container">
           <h2 className="section-title text-center mb-12">Flagship <span className="accent-text">Systems</span></h2>
           <div className="grid-3">
@@ -72,21 +72,33 @@ export default function ResearchPage() {
         <div className="container">
           <h2 className="section-title text-center mb-12">Thematic <span className="accent-text">Clusters</span></h2>
           <div className="grid-2 gap-8">
-            <div className="bg-dark p-8 rounded border border-gray">
-              <h3 className="text-xl mb-4 border-b border-gray pb-2">Quantum AI &amp; Infrastructure</h3>
-              <p className="text-sm text-muted">Investigating state-vector mapping and quantum-assisted optimization for large-scale physical networks (cities, transport grids, supply chains).</p>
+            <div className="card bg-dark flex flex-col gap-3">
+              <Network size={40} className="text-accent mb-2" />
+              <div>
+                <h3 className="text-xl mb-3 border-b border-gray pb-2">Quantum AI &amp; Infrastructure</h3>
+                <p className="text-sm text-muted">Investigating state-vector mapping and quantum-assisted optimization for large-scale physical networks (cities, transport grids, supply chains).</p>
+              </div>
             </div>
-            <div className="bg-dark p-8 rounded border border-gray">
-              <h3 className="text-xl mb-4 border-b border-gray pb-2">Smart Cities &amp; Governance</h3>
-              <p className="text-sm text-muted">Building ethical guardrails, privacy-preserving IoT aggregation techniques, and sustainable AI metrics aligned with UN SDGs.</p>
+            <div className="card bg-dark flex flex-col gap-3">
+              <Building size={40} className="text-accent mb-2" />
+              <div>
+                <h3 className="text-xl mb-3 border-b border-gray pb-2">Smart Cities &amp; Governance</h3>
+                <p className="text-sm text-muted">Building ethical guardrails, privacy-preserving IoT aggregation techniques, and sustainable AI metrics aligned with UN SDGs.</p>
+              </div>
             </div>
-            <div className="bg-dark p-8 rounded border border-gray">
-              <h3 className="text-xl mb-4 border-b border-gray pb-2">Education &amp; Learning</h3>
-              <p className="text-sm text-muted">Pedagogical shifts in the LLM era, exploring spatial computing (AR/VR) for deep experiential learning in higher education.</p>
+            <div className="card bg-dark flex flex-col gap-3">
+              <GraduationCap size={40} className="text-accent mb-2" />
+              <div>
+                <h3 className="text-xl mb-3 border-b border-gray pb-2">Education &amp; Learning</h3>
+                <p className="text-sm text-muted">Pedagogical shifts in the LLM era, exploring spatial computing (AR/VR) for deep experiential learning in higher education.</p>
+              </div>
             </div>
-            <div className="bg-dark p-8 rounded border border-gray">
-              <h3 className="text-xl mb-4 border-b border-gray pb-2">Finance &amp; Agriculture</h3>
-              <p className="text-sm text-muted">Predictive crop-yield models, algorithmic trading safety parameters, and rural FinTech adoption matrices.</p>
+            <div className="card bg-dark flex flex-col gap-3">
+              <Tractor size={40} className="text-accent mb-2" />
+              <div>
+                <h3 className="text-xl mb-3 border-b border-gray pb-2">Finance &amp; Agriculture</h3>
+                <p className="text-sm text-muted">Predictive crop-yield models, algorithmic trading safety parameters, and rural FinTech adoption matrices.</p>
+              </div>
             </div>
           </div>
         </div>

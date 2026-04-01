@@ -24,38 +24,38 @@ export default async function AIConsultingPage() {
         </div>
       </header>
 
-      <section className="section bg-secondary">
+      <section className="section bg-secondary" style={{ paddingTop: '10px' }}>
         <div className="container">
           <div className="grid-2 align-center">
             <div>
               <h2 className="section-title">Who I <span className="accent-text">Work With</span></h2>
               <p className="text-muted mb-6">Bringing global insights from European commissions and UNESCO directly to your organization.</p>
-              <div className="grid-2">
-                <div className="flex gap-4 mb-6">
-                  <Building size={32} className="text-accent flex-shrink-0" />
+              <div className="grid-2 gap-4">
+                <div className="card bg-dark">
+                  <Building size={32} className="text-accent mb-3" />
                   <div>
-                    <h4 className="font-bold mb-1">Smart Cities &amp; Govt</h4>
+                    <h4 className="font-bold mb-2">Smart Cities &amp; Govt</h4>
                     <p className="text-sm text-muted">Building ethical governance and predictive models for urban planning.</p>
                   </div>
                 </div>
-                <div className="flex gap-4 mb-6">
-                  <GraduationCap size={32} className="text-accent flex-shrink-0" />
+                <div className="card bg-dark">
+                  <GraduationCap size={32} className="text-accent mb-3" />
                   <div>
-                    <h4 className="font-bold mb-1">Universities</h4>
+                    <h4 className="font-bold mb-2">Universities</h4>
                     <p className="text-sm text-muted">Curriculum innovation and establishing AI research centers of excellence.</p>
                   </div>
                 </div>
-                <div className="flex gap-4 mb-6">
-                  <Server size={32} className="text-accent flex-shrink-0" />
+                <div className="card bg-dark">
+                  <Server size={32} className="text-accent mb-3" />
                   <div>
-                    <h4 className="font-bold mb-1">Enterprise &amp; Startups</h4>
+                    <h4 className="font-bold mb-2">Enterprise &amp; Startups</h4>
                     <p className="text-sm text-muted">Accelerating product roadmaps with cutting-edge ML and NLP integration.</p>
                   </div>
                 </div>
-                <div className="flex gap-4 mb-6">
-                  <Zap size={32} className="text-accent flex-shrink-0" />
+                <div className="card bg-dark">
+                  <Zap size={32} className="text-accent mb-3" />
                   <div>
-                    <h4 className="font-bold mb-1">Aviation &amp; Transport</h4>
+                    <h4 className="font-bold mb-2">Aviation &amp; Transport</h4>
                     <p className="text-sm text-muted">Quantum-ready infrastructure and autonomous baggage/security logic.</p>
                   </div>
                 </div>
@@ -64,21 +64,25 @@ export default async function AIConsultingPage() {
             
             <div className="bg-dark p-8 rounded border border-gray">
               <h3 className="mb-6 border-b border-gray pb-4">Flagship Services</h3>
-              <ul className="list-unstyled">
+              <ul className="bulletList">
                 <li className="mb-6">
-                  <h4 className="text-accent font-bold mb-2">AI Strategy &amp; Roadmap</h4>
+                  <ArrowRight size={16} className="text-accent" />
+                  <h4 className="text-accent font-bold mb-2 inline">AI Strategy &amp; Roadmap</h4>
                   <p className="text-sm text-muted">From readiness assessment to a 3-year execution plan.</p>
                 </li>
                 <li className="mb-6">
-                  <h4 className="text-accent font-bold mb-2">Quantum AI &amp; Smart Infrastructure</h4>
+                  <ArrowRight size={16} className="text-accent" />
+                  <h4 className="text-accent font-bold mb-2 inline">Quantum AI &amp; Smart Infrastructure</h4>
                   <p className="text-sm text-muted">Architecting the next generation of scalable, automated physical space optimizations.</p>
                 </li>
                 <li className="mb-6">
-                  <h4 className="text-accent font-bold mb-2">Ethical AI Governance Frameworks</h4>
+                  <ArrowRight size={16} className="text-accent" />
+                  <h4 className="text-accent font-bold mb-2 inline">Ethical AI Governance Frameworks</h4>
                   <p className="text-sm text-muted">Ensuring compliance, fairness, and transparency for ML pipelines at scale.</p>
                 </li>
                 <li>
-                  <h4 className="text-accent font-bold mb-2">Algorithm &amp; Product Acceleration</h4>
+                  <ArrowRight size={16} className="text-accent" />
+                  <h4 className="text-accent font-bold mb-2 inline">Algorithm &amp; Product Acceleration</h4>
                   <p className="text-sm text-muted">Rapid prototyping and model fine-tuning for high-growth tech firms.</p>
                 </li>
               </ul>
