@@ -1,0 +1,318 @@
+/* ═══════════════ Upcoming Events Section ═══════════════ */
+.eventsSection {
+  background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(249, 180, 1, 0.03) 50%, var(--bg-primary) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.eventsSection::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(249, 180, 1, 0.04) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* ── Timeline layout ── */
+.eventsTimeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* ── Event Card ── */
+.eventCard {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeSlideUp 0.5s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.eventCard:hover {
+  border-color: var(--accent);
+  transform: translateX(6px);
+  box-shadow: 0 8px 32px rgba(249, 180, 1, 0.1), inset 0 0 0 1px rgba(249, 180, 1, 0.1);
+}
+
+.eventCard:hover .glowLine {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.eventCard:hover .eventArrow {
+  opacity: 1;
+  transform: translateX(0);
+  color: var(--accent);
+}
+
+/* ── Glow line ── */
+.glowLine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--accent), rgba(249, 180, 1, 0.3));
+  border-radius: 3px;
+  opacity: 0;
+  transform: scaleY(0.3);
+  transition: all 0.35s ease;
+  transform-origin: center;
+}
+
+/* ── Date Badge ── */
+.dateBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  height: 68px;
+  background: rgba(249, 180, 1, 0.08);
+  border: 1px solid rgba(249, 180, 1, 0.15);
+  border-radius: 12px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.eventCard:hover .dateBadge {
+  background: rgba(249, 180, 1, 0.15);
+  border-color: rgba(249, 180, 1, 0.3);
+}
+
+.dateMonth {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.dateDay {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+/* ── Event Content ── */
+.eventContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.eventTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.eventMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 6px;
+}
+
+.metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.metaItem svg {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.eventDesc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+/* ── Arrow ── */
+.eventArrow {
+  flex-shrink: 0;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: all 0.3s ease;
+  color: var(--text-muted);
+}
+
+/* ═══════════════ Modal ═══════════════ */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 560px;
+  width: 100%;
+  position: relative;
+  animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modalClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modalClose:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.modalDateBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  height: 68px;
+  background: rgba(249, 180, 1, 0.08);
+  border: 1px solid rgba(249, 180, 1, 0.15);
+  border-radius: 12px;
+  flex-shrink: 0;
+  margin-bottom: 20px;
+}
+
+.modalTitle {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+  line-height: 1.3;
+  padding-right: 40px;
+}
+
+.modalMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modalDesc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+.modalLink {
+  display: inline-flex;
+  margin-top: 4px;
+}
+
+/* ═══════════════ Responsive ═══════════════ */
+@media (max-width: 768px) {
+  .eventCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px;
+  }
+
+  .dateBadge {
+    flex-direction: row;
+    gap: 8px;
+    min-width: auto;
+    height: auto;
+    padding: 6px 14px;
+  }
+
+  .dateDay {
+    font-size: 1.2rem;
+  }
+
+  .eventArrow {
+    display: none;
+  }
+
+  .modal {
+    padding: 28px;
+  }
+
+  .modalTitle {
+    font-size: 1.25rem;
+  }
+}

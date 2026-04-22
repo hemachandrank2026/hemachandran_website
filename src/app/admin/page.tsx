@@ -2,11 +2,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { BookOpen, FlaskConical, LogOut, Plus, Trash2, Loader2, Users, UploadCloud, Edit2, X, Shield, Settings as SettingsIcon, Key } from 'lucide-react';
+import { BookOpen, FlaskConical, LogOut, Plus, Trash2, Loader2, Users, UploadCloud, Edit2, X, Shield, Settings as SettingsIcon, Key, CalendarDays } from 'lucide-react';
 import styles from './admin.module.css';
 import Pagination from '@/components/Pagination';
 
-type Tab = 'books' | 'publications' | 'affiliations' | 'patents' | 'settings' | 'security';
+type Tab = 'books' | 'publications' | 'affiliations' | 'patents' | 'events' | 'settings' | 'security';
 
 interface SettingsItem {
   homeImage: string;
@@ -19,6 +19,17 @@ interface SettingsItem {
     partnerships: number;
     fellows: number;
   };
+}
+
+interface EventItem {
+  _id: string;
+  title: string;
+  startDate: string;
+  endDate?: string;
+  location?: string;
+  description?: string;
+  imageUrl?: string;
+  link?: string;
 }
 
 interface PatentItem {
@@ -68,6 +79,7 @@ export default function AdminDashboard() {
   const [publications, setPublications] = useState<PubItem[]>([]);
   const [affiliations, setAffiliations] = useState<AffiliationItem[]>([]);
   const [patents, setPatents] = useState<PatentItem[]>([]);
+  const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -79,6 +91,7 @@ export default function AdminDashboard() {
   const [pubPage, setPubPage] = useState(1);
   const [affilPage, setAffilPage] = useState(1);
   const [patPage, setPatPage] = useState(1);
+  const [eventPage, setEventPage] = useState(1);
 
   // Book form state
   const [bookForm, setBookForm] = useState({
@@ -100,12 +113,18 @@ export default function AdminDashboard() {
     title: '', date: '', link: '', order: 0
   });
 
+  // Event form state
+  const [eventForm, setEventForm] = useState({
+    title: '', startDate: '', endDate: '', location: '', description: '', imageUrl: '', link: ''
+  });
+
   const resetForms = () => {
     setEditingId(null);
     setBookForm({ title: '', publisher: '', publishedDate: '', coverImage: '', amazonLink: '', publisherLink: '', format: 'Paperback' });
     setPubForm({ title: '', authors: '', date: '', link: '', type: 'Journal', thumbnail: '', description: '' });
     setAffilForm({ name: '', img: '', order: 0 });
     setPatentForm({ title: '', date: '', link: '', order: 0 });
+    setEventForm({ title: '', startDate: '', endDate: '', location: '', description: '', imageUrl: '', link: '' });
   };
 
   const handleTabChange = (t: Tab) => {
@@ -132,19 +151,21 @@ export default function AdminDashboard() {
   };
 
   const loadData = useCallback(async () => {
-    const [bRes, pRes, aRes, patRes, setRes] = await Promise.all([
+    const [bRes, pRes, aRes, patRes, evtRes, setRes] = await Promise.all([
       fetch('/api/books'),
       fetch('/api/publications'),
       fetch('/api/affiliations'),
       fetch('/api/patents'),
+      fetch('/api/events'),
       fetch('/api/settings'),
     ]);
     const booksData = await bRes.json();
     const pubsData = await pRes.json();
     const affilData = await aRes.json();
     const patData = await patRes.json();
+    const evtData = await evtRes.json();
     const setData = await setRes.json();
-    return { books: booksData, pubs: pubsData, affils: affilData, pats: patData, settingsData: setData };
+    return { books: booksData, pubs: pubsData, affils: affilData, pats: patData, evts: evtData, settingsData: setData };
   }, []);
 
   useEffect(() => {
@@ -154,12 +175,13 @@ export default function AdminDashboard() {
     }
     if (status === 'authenticated') {
       let cancelled = false;
-      loadData().then(({ books: b, pubs: p, affils: a, pats: pt, settingsData: s }: { books: BookItem[]; pubs: PubItem[]; affils: AffiliationItem[]; pats: PatentItem[]; settingsData: SettingsItem | null }) => {
+      loadData().then(({ books: b, pubs: p, affils: a, pats: pt, evts: ev, settingsData: s }: { books: BookItem[]; pubs: PubItem[]; affils: AffiliationItem[]; pats: PatentItem[]; evts: EventItem[]; settingsData: SettingsItem | null }) => {
         if (!cancelled) {
           setBooks(b);
           setPublications(p);
           setAffiliations(a);
           setPatents(pt);
+          setEvents(ev);
           setSettings(s);
           setLoading(false);
         }
@@ -175,6 +197,7 @@ export default function AdminDashboard() {
     setPublications(data.pubs);
     setAffiliations(data.affils);
     setPatents(data.pats);
+    setEvents(data.evts);
     setSettings(data.settingsData);
     setLoading(false);
   };
@@ -259,6 +282,34 @@ export default function AdminDashboard() {
     refreshData();
   };
 
+  // --- Events CRUD ---
+  const saveEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const url = editingId ? `/api/events/${editingId}` : '/api/events';
+    const method = editingId ? 'PUT' : 'POST';
+    await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(eventForm) });
+    resetForms();
+    refreshData();
+  };
+  const startEditEvent = (ev: EventItem) => {
+    setEventForm({
+      title: ev.title,
+      startDate: ev.startDate ? ev.startDate.split('T')[0] : '',
+      endDate: ev.endDate ? ev.endDate.split('T')[0] : '',
+      location: ev.location || '',
+      description: ev.description || '',
+      imageUrl: ev.imageUrl || '',
+      link: ev.link || ''
+    });
+    setEditingId(ev._id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const deleteEvent = async (id: string) => {
+    if (!confirm('Delete this event?')) return;
+    await fetch(`/api/events/${id}`, { method: 'DELETE' });
+    refreshData();
+  };
+
   // --- Settings & Security ---
   const saveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -327,6 +378,9 @@ export default function AdminDashboard() {
         </button>
         <button className={`${styles.tab} ${activeTab === 'patents' ? styles.tabActive : ''}`} onClick={() => handleTabChange('patents')}>
           <Shield size={18} /> Patents ({patents.length})
+        </button>
+        <button className={`${styles.tab} ${activeTab === 'events' ? styles.tabActive : ''}`} onClick={() => handleTabChange('events')}>
+          <CalendarDays size={18} /> Events ({events.length})
         </button>
         <button className={`${styles.tab} ${activeTab === 'settings' ? styles.tabActive : ''}`} onClick={() => handleTabChange('settings')}>
           <SettingsIcon size={18} /> Settings
@@ -508,6 +562,79 @@ export default function AdminDashboard() {
             ))}
           </div>
           <Pagination currentPage={patPage} totalPages={Math.ceil(patents.length / ITEMS_PER_PAGE)} onPageChange={setPatPage} />
+        </div>
+      )}
+
+      {/* ═══════════════ Events Tab ═══════════════ */}
+      {activeTab === 'events' && (
+        <div className={styles.content}>
+          <form onSubmit={saveEvent} className={styles.addForm}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3>{editingId ? <><Edit2 size={18} /> Edit Event</> : <><Plus size={18} /> Add New Event</>}</h3>
+              {editingId && <button type="button" onClick={resetForms} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}><X size={20} /></button>}
+            </div>
+            <div className={styles.formGrid}>
+              <input placeholder="Event Title *" value={eventForm.title} onChange={e => setEventForm({...eventForm, title: e.target.value})} required />
+              <input placeholder="Location" value={eventForm.location} onChange={e => setEventForm({...eventForm, location: e.target.value})} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Start Date *</label>
+                <input type="date" value={eventForm.startDate} onChange={e => setEventForm({...eventForm, startDate: e.target.value})} required />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>End Date</label>
+                <input type="date" value={eventForm.endDate} onChange={e => setEventForm({...eventForm, endDate: e.target.value})} />
+              </div>
+              <input placeholder="Event Link URL" value={eventForm.link} onChange={e => setEventForm({...eventForm, link: e.target.value})} />
+
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', backgroundColor: '#111', padding: '0 8px', borderRadius: '8px' }}>
+                <input style={{ background: 'transparent', border: 'none', padding: 0 }} placeholder="Image URL" value={eventForm.imageUrl} onChange={e => setEventForm({...eventForm, imageUrl: e.target.value})} />
+                <label style={{ cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', padding: '4px 12px', background: 'var(--accent)', color: '#000', borderRadius: '4px', fontWeight: 'bold' }}>
+                  {uploading ? <Loader2 size={14} className={styles.spin} /> : <UploadCloud size={14} />} Upload
+                  <input type="file" accept="image/*" hidden onChange={(e) => handleImageUpload(e, (url) => setEventForm({...eventForm, imageUrl: url}))} />
+                </label>
+              </div>
+            </div>
+            <div style={{ marginTop: 12 }}>
+              <textarea
+                placeholder="Description"
+                value={eventForm.description}
+                onChange={e => setEventForm({...eventForm, description: e.target.value})}
+                rows={3}
+                style={{
+                  width: '100%',
+                  background: 'var(--bg-primary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  color: 'var(--text-primary)',
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '0.85rem',
+                  resize: 'vertical'
+                }}
+              />
+            </div>
+            <button type="submit" className="btn btn-primary" style={{ marginTop: 12 }}>{editingId ? 'Save Changes' : 'Add Event'}</button>
+          </form>
+
+          <div className={styles.itemList}>
+            {events.slice((eventPage - 1) * ITEMS_PER_PAGE, eventPage * ITEMS_PER_PAGE).map((ev) => (
+              <div key={ev._id} className={styles.item}>
+                <div>
+                  <h4>{ev.title}</h4>
+                  <p>
+                    {new Date(ev.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    {ev.endDate && ` – ${new Date(ev.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
+                    {ev.location && ` · ${ev.location}`}
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button onClick={() => startEditEvent(ev)} className={styles.deleteBtn} style={{ color: 'var(--accent)' }}><Edit2 size={16} /></button>
+                  <button onClick={() => deleteEvent(ev._id)} className={styles.deleteBtn}><Trash2 size={16} /></button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <Pagination currentPage={eventPage} totalPages={Math.ceil(events.length / ITEMS_PER_PAGE)} onPageChange={setEventPage} />
         </div>
       )}
 

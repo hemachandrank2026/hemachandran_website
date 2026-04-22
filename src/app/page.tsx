@@ -5,7 +5,9 @@ import styles from './page.module.css';
 import dbConnect from '@/lib/mongodb';
 import Settings from '@/models/Settings';
 import Affiliation from '@/models/Affiliation';
+import Event from '@/models/Event';
 import { getDynamicCounts } from '@/lib/getDynamicCounts';
+import UpcomingEvents from '@/components/UpcomingEvents';
 
 export default async function Home() {
   await dbConnect();
@@ -18,6 +20,9 @@ export default async function Home() {
 
   const rawAffiliations = await Affiliation.find({}).sort({ order: 1, createdAt: -1 }).lean();
   const affiliations = JSON.parse(JSON.stringify(rawAffiliations));
+
+  const rawEvents = await Event.find({ startDate: { $gte: new Date() } }).sort({ startDate: 1 }).lean();
+  const upcomingEvents = JSON.parse(JSON.stringify(rawEvents));
 
   return (
     <>
@@ -148,6 +153,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* 4.6 Upcoming Events */}
+      <UpcomingEvents events={upcomingEvents} />
 
       {/* 5. Why global leaders work with me */}
       <section className="section">
