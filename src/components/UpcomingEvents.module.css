@@ -283,6 +283,39 @@
   margin-top: 4px;
 }
 
+/* ── Empty State ── */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  text-align: center;
+  max-width: 500px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius);
+}
+
+.emptyState svg {
+  color: var(--accent);
+  opacity: 0.5;
+  margin-bottom: 16px;
+}
+
+.emptyState p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.emptyState span {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
 /* ═══════════════ Responsive ═══════════════ */
 @media (max-width: 768px) {
   .eventCard {

@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Calendar, MapPin, ArrowRight, X, ExternalLink } from 'lucide-react';
+import { Calendar, CalendarDays, MapPin, ArrowRight, X, ExternalLink } from 'lucide-react';
 import styles from './UpcomingEvents.module.css';
 
 interface EventItem {
@@ -17,7 +17,7 @@ interface EventItem {
 export default function UpcomingEvents({ events }: { events: EventItem[] }) {
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
 
-  if (!events || events.length === 0) return null;
+  const hasEvents = events && events.length > 0;
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('en-US', {
@@ -53,54 +53,62 @@ export default function UpcomingEvents({ events }: { events: EventItem[] }) {
             Conferences, summits and workshops where you can connect with me.
           </p>
 
-          <div className={styles.eventsTimeline}>
-            {events.map((event, index) => (
-              <div
-                key={event._id}
-                className={styles.eventCard}
-                style={{ animationDelay: `${index * 0.1}s` }}
-                onClick={() => setSelectedEvent(event)}
-              >
-                {/* Date badge */}
-                <div className={styles.dateBadge}>
-                  <span className={styles.dateMonth}>{getMonthShort(event.startDate)}</span>
-                  <span className={styles.dateDay}>{getDay(event.startDate)}</span>
-                </div>
+          {hasEvents ? (
+            <div className={styles.eventsTimeline}>
+              {events.map((event, index) => (
+                <div
+                  key={event._id}
+                  className={styles.eventCard}
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                  onClick={() => setSelectedEvent(event)}
+                >
+                  {/* Date badge */}
+                  <div className={styles.dateBadge}>
+                    <span className={styles.dateMonth}>{getMonthShort(event.startDate)}</span>
+                    <span className={styles.dateDay}>{getDay(event.startDate)}</span>
+                  </div>
 
-                {/* Content */}
-                <div className={styles.eventContent}>
-                  <h3 className={styles.eventTitle}>{event.title}</h3>
-                  <div className={styles.eventMeta}>
-                    <span className={styles.metaItem}>
-                      <Calendar size={14} />
-                      {formatDateRange(event.startDate, event.endDate)}
-                    </span>
-                    {event.location && (
+                  {/* Content */}
+                  <div className={styles.eventContent}>
+                    <h3 className={styles.eventTitle}>{event.title}</h3>
+                    <div className={styles.eventMeta}>
                       <span className={styles.metaItem}>
-                        <MapPin size={14} />
-                        {event.location}
+                        <Calendar size={14} />
+                        {formatDateRange(event.startDate, event.endDate)}
                       </span>
+                      {event.location && (
+                        <span className={styles.metaItem}>
+                          <MapPin size={14} />
+                          {event.location}
+                        </span>
+                      )}
+                    </div>
+                    {event.description && (
+                      <p className={styles.eventDesc}>
+                        {event.description.length > 120
+                          ? event.description.substring(0, 120) + '...'
+                          : event.description}
+                      </p>
                     )}
                   </div>
-                  {event.description && (
-                    <p className={styles.eventDesc}>
-                      {event.description.length > 120
-                        ? event.description.substring(0, 120) + '...'
-                        : event.description}
-                    </p>
-                  )}
-                </div>
 
-                {/* Arrow */}
-                <div className={styles.eventArrow}>
-                  <ArrowRight size={20} />
-                </div>
+                  {/* Arrow */}
+                  <div className={styles.eventArrow}>
+                    <ArrowRight size={20} />
+                  </div>
 
-                {/* Glow line */}
-                <div className={styles.glowLine} />
-              </div>
-            ))}
-          </div>
+                  {/* Glow line */}
+                  <div className={styles.glowLine} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className={styles.emptyState}>
+              <CalendarDays size={48} />
+              <p>No upcoming events scheduled at the moment.</p>
+              <span>Check back soon for new conferences, summits, and workshops.</span>
+            </div>
+          )}
         </div>
       </section>
 
