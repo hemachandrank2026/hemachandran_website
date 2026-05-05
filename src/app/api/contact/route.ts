@@ -9,15 +9,16 @@ export async function POST(req: Request) {
     
     // Extract the form fields from the frontend request
     // The frontend sends an array of subjects, so we join them if it's an array, or just use it as string.
-    const { name, email, message } = object;
-    let { subject } = object;
+    const { name, email, message, keynote, advisory, consulting, workshop } = object;
     
-    // Convert subject array to string if it is an array (from the checkboxes)
-    if (Array.isArray(subject)) {
-      subject = subject.join(', ');
-    } else if (!subject) {
-      subject = 'General Inquiry';
-    }
+    // Construct subject based on checked interests
+    const topics = [];
+    if (keynote === 'on') topics.push('Keynote / Panel');
+    if (advisory === 'on') topics.push('Advisory / Board');
+    if (consulting === 'on') topics.push('AI Consulting');
+    if (workshop === 'on') topics.push('Executive Workshop');
+
+    const subject = topics.length > 0 ? topics.join(', ') : 'General Inquiry';
 
     // Send the email using Resend
     const { data, error } = await resend.emails.send({
@@ -41,7 +42,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, message: error.message || 'Failed to send message via Resend.' }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true, message: 'Message sent successfully!', data });
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Message sent successfully!',
+      id: data?.id 
+    });
   } catch (error) {
     console.error('Error in Resend API route:', error);
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
