@@ -142,7 +142,7 @@ export default function UpcomingEvents({ events }: { events: EventItem[] }) {
                   alt={selectedEvent.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 400px"
-                  style={{ objectFit: 'cover' }}
+                  style={{ objectFit: 'contain' }}
                 />
               </div>
             )}
