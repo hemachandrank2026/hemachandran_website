@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import FloatingContact from "@/components/FloatingContact";
 
 export const metadata: Metadata = {
   title: "Hemachandran K | AI Research Director & Associate Dean",
@@ -20,6 +21,7 @@ export default function RootLayout({
         <main style={{ minHeight: '100vh' }}>
           {children}
         </main>
+        <FloatingContact />
         <Footer />
       </body>
     </html>

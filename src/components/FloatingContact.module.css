@@ -1,0 +1,86 @@
+.floatingBtn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  height: 56px;
+  border-radius: 28px;
+  padding: 0 16px;
+  cursor: pointer;
+  z-index: 999;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(249, 180, 1, 0.2);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-decoration: none;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+.floatingBtn:hover {
+  background: var(--accent);
+  color: #000;
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(249, 180, 1, 0.4);
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.floatingBtn:hover .iconWrapper {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.btnText {
+  max-width: 0;
+  opacity: 0;
+  white-space: nowrap;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.4s ease;
+  margin-left: 0;
+}
+
+/* Expand on hover */
+.floatingBtn:hover .btnText {
+  max-width: 150px;
+  opacity: 1;
+  margin-left: 10px;
+}
+
+/* Subtle pulse animation for the button to draw attention */
+@keyframes pulseGlow {
+  0% { box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 0 0 rgba(249, 180, 1, 0.4); }
+  70% { box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 0 15px rgba(249, 180, 1, 0); }
+  100% { box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 0 0 rgba(249, 180, 1, 0); }
+}
+
+.floatingBtn {
+  animation: pulseGlow 3s infinite;
+}
+
+.floatingBtn:hover {
+  animation: none;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .floatingBtn {
+    bottom: 20px;
+    right: 20px;
+    height: 50px;
+    border-radius: 25px;
+    padding: 0 14px;
+  }
+}
