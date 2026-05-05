@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Mic, Briefcase, Code, Presentation, ShieldCheck, Award, Zap, Building, Users, BookOpen } from 'lucide-react';
