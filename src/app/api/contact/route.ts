@@ -1,38 +1,49 @@
 import { NextResponse } from 'next/server';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
   try {
     const object = await req.json();
     
-    // The server securely appends the private access key without exposing it to the browser
-    const accessKey = process.env.WEB3FORMS_ACCESS_KEY || '5c40ad72-eedb-4e5a-a1e7-53faf8f1e868';
-    object.access_key = accessKey;
+    // Extract the form fields from the frontend request
+    // The frontend sends an array of subjects, so we join them if it's an array, or just use it as string.
+    const { name, email, message } = object;
+    let { subject } = object;
+    
+    // Convert subject array to string if it is an array (from the checkboxes)
+    if (Array.isArray(subject)) {
+      subject = subject.join(', ');
+    } else if (!subject) {
+      subject = 'General Inquiry';
+    }
 
-    const response = await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify(object)
+    // Send the email using Resend
+    const { data, error } = await resend.emails.send({
+      from: 'Website Contact Form <contact@hemachandran.aircwou.in>',
+      to: [process.env.RESEND_TO_EMAIL || 'vishal.sharma@woxsen.edu.in'], // The email address receiving the messages
+      replyTo: email, // This allows you to directly hit "Reply" in your inbox to reply to the user
+      subject: `New Inquiry: ${subject}`,
+      html: `
+        <h2>New Contact Form Submission</h2>
+        <p><strong>Name:</strong> ${name || 'Not provided'}</p>
+        <p><strong>Email:</strong> ${email || 'Not provided'}</p>
+        <p><strong>Subject / Topics:</strong> ${subject}</p>
+        <hr />
+        <h3>Message:</h3>
+        <p style="white-space: pre-wrap;">${message || 'No additional message.'}</p>
+      `
     });
 
-    const responseText = await response.text();
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch {
-      console.warn('Web3Forms returned non-JSON:', responseText);
-      data = { message: 'Unexpected response from mail server.' };
+    if (error) {
+      console.error('Resend Error:', error);
+      return NextResponse.json({ success: false, message: error.message || 'Failed to send message via Resend.' }, { status: 400 });
     }
-    
-    if (response.ok) {
-      return NextResponse.json(data);
-    } else {
-      return NextResponse.json({ success: false, message: data.message || 'Error from Web3Forms' }, { status: response.status });
-    }
+
+    return NextResponse.json({ success: true, message: 'Message sent successfully!', data });
   } catch (error) {
-    console.error('Error securely proxying form submission:', error);
+    console.error('Error in Resend API route:', error);
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
   }
 }
